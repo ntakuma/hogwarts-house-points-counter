@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts House Points Hourglasses</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Magical Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Fauna+One&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#fef9c3',
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                        },
+                        gryffindor: '#740001',
+                        hufflepuff: '#ecb939',
+                        ravenclaw: '#0e1a40',
+                        slytherin: '#1a472a'
+                    },
+                    fontFamily: {
+                        title: ['"Cinzel Decorative"', 'serif'],
+                        cinzel: ['"Cinzel"', 'serif'],
+                        body: ['"Fauna One"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #07060A;
+            background-image: 
+                radial-gradient(circle at 50% 15%, rgba(140, 95, 25, 0.22) 0%, transparent 65%),
+                radial-gradient(circle at 15% 85%, rgba(10, 25, 55, 0.35) 0%, transparent 55%),
+                radial-gradient(circle at 85% 85%, rgba(20, 55, 25, 0.3) 0%, transparent 55%);
+            color: #E2D9C8;
+            font-family: 'Fauna One', serif;
+            min-height: 100vh;
+        }
+
+        .gold-border {
+            border: 2px solid #ca8a04;
+            box-shadow: 0 0 20px rgba(202, 138, 4, 0.25), inset 0 0 12px rgba(202, 138, 4, 0.12);
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFE082 0%, #D4AF37 50%, #AA7C11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .parchment-bg {
+            background: #111018;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.85);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07060A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ca8a04;
+            border-radius: 3px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(180deg, #d4af37 0%, #996515 100%);
+            color: #07060A;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+        }
+        .btn-gold:hover {
+            background: linear-gradient(180deg, #f3e5ab 0%, #d4af37 100%);
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.7);
+            transform: translateY(-1px);
+        }
+        .btn-gold:active {
+            transform: translateY(1px);
+        }
+
+        .house-trigger-btn {
+            transition: all 0.25s ease;
+        }
+        .house-trigger-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            filter: brightness(1.15);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen pb-16">
+
+    <!-- Header Section -->
+    <header class="text-center py-6 px-4 border-b border-yellow-700/30 bg-black/50 backdrop-blur-md relative z-20">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-hat-wizard text-3xl text-yellow-500"></i>
+                <h1 class="font-title text-2xl md:text-3xl font-bold tracking-wider gold-gradient-text">
+                    HOGWARTS HOUSE POINTS
+                </h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Mute / Unmute Button -->
+                <button id="mute-btn" onclick="toggleMute()" class="px-3 py-2 rounded-lg bg-yellow-950/40 border border-yellow-700/50 text-yellow-300 hover:bg-yellow-900/50 transition flex items-center gap-2 text-sm font-cinzel">
+                    <i id="mute-icon" class="fa-solid fa-volume-high"></i>
+                    <span id="mute-text">Sound ON</span>
+                </button>
+
+                <!-- Reset Points Button -->
+                <button onclick="confirmReset()" class="px-3 py-2 rounded-lg bg-red-950/40 border border-red-700/50 text-red-300 hover:bg-red-900/50 transition flex items-center gap-2 text-sm font-cinzel">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Reset All</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8 flex flex-col gap-8">
+
+        <!-- STREAMLINED TOP CONTROL PANEL -->
+        <section class="parchment-bg rounded-2xl p-6 gold-border relative overflow-hidden z-20">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-800 via-yellow-500 to-green-800"></div>
+            
+            <div class="text-center mb-5">
+                <h2 class="font-cinzel text-xl font-bold gold-gradient-text tracking-widest uppercase">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Grand Hourglass Control Panel
+                </h2>
+                <p class="text-xs text-yellow-200/70 mt-1">Select point amount, action mode, and click a house button below to award or deduct</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <!-- Step 1: Mode Selection (Add vs Deduct) -->
+                <div class="flex items-center bg-black/60 p-1.5 rounded-xl border border-yellow-900/40">
+                    <button id="mode-add-btn" onclick="setMode('add')" class="px-4 py-2 rounded-lg text-sm font-cinzel font-bold transition flex items-center gap-2 bg-emerald-700 text-white shadow-lg">
+                        <i class="fa-solid fa-plus-circle"></i> Award (+)
+                    </button>
+                    <button id="mode-sub-btn" onclick="setMode('sub')" class="px-4 py-2 rounded-lg text-sm font-cinzel font-bold transition flex items-center gap-2 text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-minus-circle"></i> Deduct (-)
+                    </button>
+                </div>
+
+                <!-- Step 2: Preset Value Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <button onclick="setPointsPreset(5)" class="val-btn px-3.5 py-1.5 rounded-lg border border-yellow-700/50 bg-black/40 hover:bg-yellow-900/40 text-yellow-200 font-cinzel font-bold transition active" data-val="5">5</button>
+                    <button onclick="setPointsPreset(10)" class="val-btn px-3.5 py-1.5 rounded-lg border border-yellow-700/50 bg-black/40 hover:bg-yellow-900/40 text-yellow-200 font-cinzel font-bold transition" data-val="10">10</button>
+                    <button onclick="setPointsPreset(25)" class="val-btn px-3.5 py-1.5 rounded-lg border border-yellow-700/50 bg-black/40 hover:bg-yellow-900/40 text-yellow-200 font-cinzel font-bold transition" data-val="25">25</button>
+                    <button onclick="setPointsPreset(50)" class="val-btn px-3.5 py-1.5 rounded-lg border border-yellow-700/50 bg-black/40 hover:bg-yellow-900/40 text-yellow-200 font-cinzel font-bold transition" data-val="50">50</button>
+                    <button onclick="setPointsPreset(100)" class="val-btn px-3.5 py-1.5 rounded-lg border border-yellow-700/50 bg-black/40 hover:bg-yellow-900/40 text-yellow-200 font-cinzel font-bold transition" data-val="100">100</button>
+                    
+                    <!-- Custom Amount Input -->
+                    <div class="flex items-center ml-2 border border-yellow-700/50 rounded-lg bg-black/60 overflow-hidden px-2 py-1">
+                        <span class="text-xs text-yellow-500/70 mr-1 font-cinzel">Custom:</span>
+                        <input type="number" id="custom-points" min="1" max="1000" placeholder="Qty" class="w-16 bg-transparent text-yellow-200 font-bold text-center focus:outline-none text-sm" oninput="clearPresetActive()">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INLINE SIDE-BY-SIDE TRUE HOURGLASSES -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            
+            <!-- Gryffindor Hourglass Card -->
+            <div id="card-gryffindor" class="parchment-bg rounded-2xl p-5 flex flex-col justify-between items-center relative group border border-red-900/40 hover:border-red-600/60 transition shadow-2xl">
+                <div class="lead-badge hidden absolute -top-3 bg-gradient-to-r from-amber-500 to-yellow-300 text-black font-cinzel font-bold text-xs px-3 py-1 rounded-full shadow-lg z-10 animate-bounce">
+                    <i class="fa-solid fa-crown mr-1"></i> LEADING HOUSE
+                </div>
+
+                <!-- House Header -->
+                <div class="text-center w-full mb-3">
+                    <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-red-950/80 border border-red-600/50 flex items-center justify-center text-red-500 text-2xl shadow-inner">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
+                    <h3 class="font-cinzel font-bold text-xl text-red-400 tracking-wider">GRYFFINDOR</h3>
+                    <p class="text-3xl font-cinzel font-bold text-yellow-400 my-1" id="score-gryffindor">0</p>
+                    <span class="text-xs text-red-300/60 font-cinzel uppercase tracking-widest">Ruby Gems</span>
+                </div>
+
+                <!-- True Hourglass Graphic Container -->
+                <div class="w-full h-80 my-2 relative flex items-center justify-center">
+                    <canvas id="canvas-gryffindor" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- House Trigger Button -->
+                <button onclick="applyPointsToHouse('gryffindor')" class="house-trigger-btn w-full mt-3 py-3 rounded-xl bg-gradient-to-r from-red-950 to-red-900 border border-red-700/60 text-red-200 font-cinzel text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-wand-sparkles text-red-400"></i>
+                    <span>Apply to Gryffindor</span>
+                </button>
+            </div>
+
+            <!-- Hufflepuff Hourglass Card -->
+            <div id="card-hufflepuff" class="parchment-bg rounded-2xl p-5 flex flex-col justify-between items-center relative group border border-amber-900/40 hover:border-amber-600/60 transition shadow-2xl">
+                <div class="lead-badge hidden absolute -top-3 bg-gradient-to-r from-amber-500 to-yellow-300 text-black font-cinzel font-bold text-xs px-3 py-1 rounded-full shadow-lg z-10 animate-bounce">
+                    <i class="fa-solid fa-crown mr-1"></i> LEADING HOUSE
+                </div>
+
+                <!-- House Header -->
+                <div class="text-center w-full mb-3">
+                    <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-yellow-950/80 border border-yellow-600/50 flex items-center justify-center text-yellow-400 text-2xl shadow-inner">
+                        <i class="fa-solid fa-paw"></i>
+                    </div>
+                    <h3 class="font-cinzel font-bold text-xl text-yellow-400 tracking-wider">HUFFLEPUFF</h3>
+                    <p class="text-3xl font-cinzel font-bold text-yellow-400 my-1" id="score-hufflepuff">0</p>
+                    <span class="text-xs text-yellow-300/60 font-cinzel uppercase tracking-widest">Topaz Gems</span>
+                </div>
+
+                <!-- True Hourglass Graphic Container -->
+                <div class="w-full h-80 my-2 relative flex items-center justify-center">
+                    <canvas id="canvas-hufflepuff" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- House Trigger Button -->
+                <button onclick="applyPointsToHouse('hufflepuff')" class="house-trigger-btn w-full mt-3 py-3 rounded-xl bg-gradient-to-r from-yellow-950 to-amber-900 border border-yellow-700/60 text-yellow-200 font-cinzel text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-wand-sparkles text-yellow-400"></i>
+                    <span>Apply to Hufflepuff</span>
+                </button>
+            </div>
+
+            <!-- Ravenclaw Hourglass Card -->
+            <div id="card-ravenclaw" class="parchment-bg rounded-2xl p-5 flex flex-col justify-between items-center relative group border border-blue-900/40 hover:border-blue-600/60 transition shadow-2xl">
+                <div class="lead-badge hidden absolute -top-3 bg-gradient-to-r from-amber-500 to-yellow-300 text-black font-cinzel font-bold text-xs px-3 py-1 rounded-full shadow-lg z-10 animate-bounce">
+                    <i class="fa-solid fa-crown mr-1"></i> LEADING HOUSE
+                </div>
+
+                <!-- House Header -->
+                <div class="text-center w-full mb-3">
+                    <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-blue-950/80 border border-blue-600/50 flex items-center justify-center text-blue-400 text-2xl shadow-inner">
+                        <i class="fa-solid fa-crow"></i>
+                    </div>
+                    <h3 class="font-cinzel font-bold text-xl text-blue-400 tracking-wider">RAVENCLAW</h3>
+                    <p class="text-3xl font-cinzel font-bold text-yellow-400 my-1" id="score-ravenclaw">0</p>
+                    <span class="text-xs text-blue-300/60 font-cinzel uppercase tracking-widest">Sapphire Gems</span>
+                </div>
+
+                <!-- True Hourglass Graphic Container -->
+                <div class="w-full h-80 my-2 relative flex items-center justify-center">
+                    <canvas id="canvas-ravenclaw" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- House Trigger Button -->
+                <button onclick="applyPointsToHouse('ravenclaw')" class="house-trigger-btn w-full mt-3 py-3 rounded-xl bg-gradient-to-r from-blue-950 to-indigo-950 border border-blue-700/60 text-blue-200 font-cinzel text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-wand-sparkles text-blue-400"></i>
+                    <span>Apply to Ravenclaw</span>
+                </button>
+            </div>
+
+            <!-- Slytherin Hourglass Card -->
+            <div id="card-slytherin" class="parchment-bg rounded-2xl p-5 flex flex-col justify-between items-center relative group border border-emerald-900/40 hover:border-emerald-600/60 transition shadow-2xl">
+                <div class="lead-badge hidden absolute -top-3 bg-gradient-to-r from-amber-500 to-yellow-300 text-black font-cinzel font-bold text-xs px-3 py-1 rounded-full shadow-lg z-10 animate-bounce">
+                    <i class="fa-solid fa-crown mr-1"></i> LEADING HOUSE
+                </div>
+
+                <!-- House Header -->
+                <div class="text-center w-full mb-3">
+                    <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-emerald-950/80 border border-emerald-600/50 flex items-center justify-center text-emerald-400 text-2xl shadow-inner">
+                        <i class="fa-solid fa-worm"></i>
+                    </div>
+                    <h3 class="font-cinzel font-bold text-xl text-emerald-400 tracking-wider">SLYTHERIN</h3>
+                    <p class="text-3xl font-cinzel font-bold text-yellow-400 my-1" id="score-slytherin">0</p>
+                    <span class="text-xs text-emerald-300/60 font-cinzel uppercase tracking-widest">Emerald Gems</span>
+                </div>
+
+                <!-- True Hourglass Graphic Container -->
+                <div class="w-full h-80 my-2 relative flex items-center justify-center">
+                    <canvas id="canvas-slytherin" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- House Trigger Button -->
+                <button onclick="applyPointsToHouse('slytherin')" class="house-trigger-btn w-full mt-3 py-3 rounded-xl bg-gradient-to-r from-emerald-950 to-green-950 border border-emerald-700/60 text-emerald-200 font-cinzel text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-wand-sparkles text-emerald-400"></i>
+                    <span>Apply to Slytherin</span>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- ACTIVITY / RECENT HISTORY LOG -->
+        <section class="parchment-bg rounded-2xl p-6 gold-border">
+            <div class="flex items-center justify-between mb-4 border-b border-yellow-700/30 pb-3">
+                <h3 class="font-cinzel font-bold text-lg text-yellow-300 flex items-center gap-2">
+                    <i class="fa-solid fa-scroll text-yellow-500"></i> House Points Ledger
+                </h3>
+                <button onclick="clearLog()" class="text-xs text-yellow-500/70 hover:text-yellow-200 transition font-cinzel">
+                    Clear Log
+                </button>
+            </div>
+            <div id="log-container" class="max-h-40 overflow-y-auto space-y-2 text-sm pr-2">
+                <p class="text-gray-500 text-xs italic text-center py-2">No recent point adjustments recorded.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Celebration Sparkle Effects Canvas -->
+    <canvas id="effects-canvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+    <!-- Application Script -->
+    <script>
+        // --- HOUSE CONFIGURATIONS & STATE ---
+        const HOUSES = {
+            gryffindor: {
+                name: "Gryffindor",
+                color: "#dc2626",
+                gemColors: ["#EF4444", "#B91C1C", "#7F1D1D", "#FCA5A5"],
+                score: 0,
+                canvas: null,
+                ctx: null,
+                gems: []
+            },
+            hufflepuff: {
+                name: "Hufflepuff",
+                color: "#eab308",
+                gemColors: ["#FACC15", "#CA8A04", "#854D0E", "#FEF08A"],
+                score: 0,
+                canvas: null,
+                ctx: null,
+                gems: []
+            },
+            ravenclaw: {
+                name: "Ravenclaw",
+                color: "#2563eb",
+                gemColors: ["#3B82F6", "#1D4ED8", "#1E3A8A", "#93C5FD"],
+                score: 0,
+                canvas: null,
+                ctx: null,
+                gems: []
+            },
+            slytherin: {
+                name: "Slytherin",
+                color: "#16a34a",
+                gemColors: ["#22C55E", "#15803D", "#14532D", "#86EFAC"],
+                score: 0,
+                canvas: null,
+                ctx: null,
+                gems: []
+            }
+        };
+
+        let currentMode = 'add'; // 'add' or 'sub'
+        let selectedPresetValue = 5;
+        let isMuted = false;
+        let historyLog = [];
+
+        // --- WEB AUDIO API SYNTHESIZER ---
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'award') {
+                // Magical shimmering arpeggio
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+                    gain.gain.setValueAtTime(0, now + idx * 0.05);
+                    gain.gain.linearRampToValueAtTime(0.18, now + idx * 0.05 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(now + idx * 0.05);
+                    osc.stop(now + idx * 0.05 + 0.4);
+                });
+            } else if (type === 'deduct') {
+                // Low resonant mystical descending tone
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(70, now + 0.45);
+
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.55);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-icon').className = isMuted ? 'fa-solid fa-volume-xmark text-red-400' : 'fa-solid fa-volume-high';
+            document.getElementById('mute-text').innerText = isMuted ? 'Muted' : 'Sound ON';
+        }
+
+        // --- TOP CONTROL PANEL LOGIC ---
+        function setMode(mode) {
+            currentMode = mode;
+            const addBtn = document.getElementById('mode-add-btn');
+            const subBtn = document.getElementById('mode-sub-btn');
+
+            if (mode === 'add') {
+                addBtn.className = "px-4 py-2 rounded-lg text-sm font-cinzel font-bold transition flex items-center gap-2 bg-emerald-700 text-white shadow-lg";
+                subBtn.className = "px-4 py-2 rounded-lg text-sm font-cinzel font-bold transition flex items-center gap-2 text-gray-400 hover:text-white";
+            } else {
+                subBtn.className = "px-4 py-2 rounded-lg text-sm font-cinzel font-bold transition flex items-center gap-2 bg-red-700 text-white shadow-lg";
+                addBtn.className = "px-4 py-2 rounded-lg text-sm font-cinzel font-bold transition flex items-center gap-2 text-gray-400 hover:text-white";
+            }
+        }
+
+        function setPointsPreset(val) {
+            selectedPresetValue = val;
+            document.getElementById('custom-points').value = '';
+            
+            document.querySelectorAll('.val-btn').forEach(btn => {
+                if (parseInt(btn.getAttribute('data-val')) === val) {
+                    btn.classList.add('bg-yellow-600', 'text-black');
+                    btn.classList.remove('bg-black/40', 'text-yellow-200');
+                } else {
+                    btn.classList.remove('bg-yellow-600', 'text-black');
+                    btn.classList.add('bg-black/40', 'text-yellow-200');
+                }
+            });
+        }
+
+        function clearPresetActive() {
+            document.querySelectorAll('.val-btn').forEach(btn => {
+                btn.classList.remove('bg-yellow-600', 'text-black');
+                btn.classList.add('bg-black/40', 'text-yellow-200');
+            });
+        }
+
+        function getSelectedPoints() {
+            const customVal = parseInt(document.getElementById('custom-points').value);
+            if (!isNaN(customVal) && customVal > 0) {
+                return customVal;
+            }
+            return selectedPresetValue;
+        }
+
+        function applyPointsToHouse(houseKey) {
+            const amount = getSelectedPoints();
+            const delta = currentMode === 'add' ? amount : -amount;
+            applyPoints(houseKey, delta);
+        }
+
+        // --- CORE POINT MODIFICATION & SIMULATION ---
+        function applyPoints(houseKey, amount) {
+            const house = HOUSES[houseKey];
+            if (!house) return;
+
+            const oldScore = house.score;
+            house.score = Math.max(0, house.score + amount);
+            const actualDiff = house.score - oldScore;
+
+            // Update DOM Score display
+            document.getElementById(`score-${houseKey}`).innerText = house.score;
+
+            if (actualDiff > 0) {
+                playSound('award');
+                spawnGems(houseKey, Math.min(actualDiff, 40));
+                triggerSparkles(houseKey);
+                addLogEntry(`Awarded ${actualDiff} points to ${house.name}.`, 'award');
+            } else if (actualDiff < 0) {
+                playSound('deduct');
+                removeGems(houseKey, Math.min(Math.abs(actualDiff), 40));
+                addLogEntry(`Deducted ${Math.abs(actualDiff)} points from ${house.name}.`, 'deduct');
+            }
+
+            updateLeadBadges();
+            saveState();
+        }
+
+        function updateLeadBadges() {
+            let maxScore = -1;
+            let leaders = [];
+
+            Object.keys(HOUSES).forEach(key => {
+                const score = HOUSES[key].score;
+                if (score > maxScore) {
+                    maxScore = score;
+                    leaders = [key];
+                } else if (score === maxScore && score > 0) {
+                    leaders.push(key);
+                }
+            });
+
+            Object.keys(HOUSES).forEach(key => {
+                const card = document.getElementById(`card-${key}`);
+                const badge = card.querySelector('.lead-badge');
+                if (maxScore > 0 && leaders.includes(key)) {
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- TRUE HOURGLASS CANVAS PHYSICS & RENDERING ---
+        function initCanvases() {
+            Object.keys(HOUSES).forEach(key => {
+                const house = HOUSES[key];
+                house.canvas = document.getElementById(`canvas-${key}`);
+                
+                const rect = house.canvas.parentElement.getBoundingClientRect();
+                house.canvas.width = rect.width;
+                house.canvas.height = rect.height;
+                house.ctx = house.canvas.getContext('2d');
+            });
+        }
+
+        class Gem {
+            constructor(w, h, palette, startingInBottom = false) {
+                this.radius = Math.random() * 2.5 + 3;
+                this.color = palette[Math.floor(Math.random() * palette.length)];
+                this.reset(w, h, startingInBottom);
+            }
+
+            reset(w, h, inBottom) {
+                const midY = h / 2;
+                if (inBottom) {
+                    this.x = w / 2 + (Math.random() - 0.5) * 80;
+                    this.y = h - 25 - Math.random() * (h * 0.35);
+                    this.settled = true;
+                } else {
+                    // Spawn in top bulb
+                    this.x = w / 2 + (Math.random() - 0.5) * 60;
+                    this.y = 30 + Math.random() * (h * 0.2);
+                    this.settled = false;
+                }
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = Math.random() * 2 + 1;
+            }
+
+            update(w, h, existingGems) {
+                const midX = w / 2;
+                const midY = h / 2;
+
+                if (this.settled) return;
+
+                this.vy += 0.25; // Gravity
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Hourglass boundary constraints (True Hourglass Shape)
+                // Top bulb geometry: width expands from bottleneck (midY) upward to top corners
+                // Bottom bulb geometry: width expands from bottleneck (midY) downward to bottom base
+                
+                if (this.y < midY) {
+                    // In top bulb
+                    const topBulbProgress = (this.y - 15) / (midY - 15);
+                    const allowedHalfWidth = Math.max(12, topBulbProgress * (w * 0.38));
+                    
+                    if (this.x < midX - allowedHalfWidth) {
+                        this.x = midX - allowedHalfWidth;
+                        this.vx *= -0.5;
+                    } else if (this.x > midX + allowedHalfWidth) {
+                        this.x = midX + allowedHalfWidth;
+                        this.vx *= -0.5;
+                    }
+
+                    // If reaching bottleneck, funnel through to bottom bulb
+                    if (this.y >= midY - 6 && Math.abs(this.x - midX) < 14) {
+                        this.y = midY + 4;
+                        this.vy = Math.abs(this.vy) + 1;
+                    } else if (this.y >= midY - 6) {
+                        // Hit neck walls
+                        this.y = midY - 6;
+                        this.vx = (Math.random() - 0.5) * 3;
+                    }
+                } else {
+                    // In bottom bulb
+                    const bottomBulbProgress = (h - this.y) / (h - midY);
+                    const allowedHalfWidth = Math.max(12, bottomBulbProgress * (w * 0.42));
+
+                    if (this.x < midX - allowedHalfWidth) {
+                        this.x = midX - allowedHalfWidth;
+                        this.vx *= -0.4;
+                    } else if (this.x > midX + allowedHalfWidth) {
+                        this.x = midX + allowedHalfWidth;
+                        this.vx *= -0.4;
+                    }
+
+                    // Floor collision
+                    if (this.y + this.radius >= h - 15) {
+                        this.y = h - 15 - this.radius;
+                        this.settled = true;
+                    }
+
+                    // Stack collision with settled gems in bottom
+                    for (let other of existingGems) {
+                        if (other === this || !other.settled) continue;
+                        const dx = other.x - this.x;
+                        const dy = other.y - this.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < this.radius + other.radius) {
+                            this.y = other.y - this.radius - 1;
+                            this.settled = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 5;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function drawHourglassFrame(ctx, w, h) {
+            const midX = w / 2;
+            const midY = h / 2;
+
+            ctx.save();
+            
+            // Outer Gold Frame & Wood Trim
+            ctx.strokeStyle = "#ca8a04";
+            ctx.lineWidth = 3;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.02)";
+
+            // Draw hourglass glass outline (Top bulb, Narrow Waist, Bottom bulb)
+            ctx.beginPath();
+            // Top cap
+            ctx.moveTo(midX - 35, 15);
+            ctx.lineTo(midX + 35, 15);
+            // Top bulb outward curve
+            ctx.bezierCurveTo(w * 0.85, 20, w * 0.85, midY - 20, midX + 12, midY - 5);
+            // Waist bottleneck
+            ctx.lineTo(midX + 5, midY);
+            ctx.lineTo(midX - 5, midY);
+            ctx.lineTo(midX - 12, midY - 5);
+            // Bottom bulb outward curve
+            ctx.bezierCurveTo(w * 0.15, midY - 20, w * 0.15, h - 20, midX - 35, h - 15);
+            // Bottom cap
+            ctx.lineTo(midX + 35, h - 15);
+            ctx.bezierCurveTo(w * 0.85, h - 20, w * 0.85, midY + 20, midX + 12, midY + 5);
+            ctx.lineTo(midX + 5, midY);
+            ctx.lineTo(midX - 5, midY);
+            ctx.lineTo(midX - 12, midY + 5);
+            ctx.bezierCurveTo(w * 0.15, midY + 20, w * 0.15, 20, midX - 35, 15);
+            
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Wooden/Brass Caps at Top and Bottom
+            ctx.fillStyle = "#854d0e";
+            ctx.fillRect(midX - 40, 10, 80, 8);
+            ctx.fillRect(midX - 40, h - 18, 80, 8);
+
+            // Glass Reflection Sheen
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(midX - 25, 25);
+            ctx.quadraticCurveTo(w * 0.25, midY * 0.5, midX - 8, midY - 10);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function spawnGems(houseKey, count) {
+            const house = HOUSES[houseKey];
+            if (!house || !house.canvas) return;
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const gem = new Gem(house.canvas.width, house.canvas.height, house.gemColors, false);
+                    house.gems.push(gem);
+                }, i * 35);
+            }
+        }
+
+        function removeGems(houseKey, count) {
+            const house = HOUSES[houseKey];
+            if (!house) return;
+            house.gems.splice(0, count);
+        }
+
+        function animateHourglasses() {
+            Object.keys(HOUSES).forEach(key => {
+                const house = HOUSES[key];
+                if (!house.ctx || !house.canvas) return;
+
+                const ctx = house.ctx;
+                const w = house.canvas.width;
+                const h = house.canvas.height;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Draw physical hourglass structure
+                drawHourglassFrame(ctx, w, h);
+
+                // Target gem count proportional to points (max ~180 gems)
+                const targetGemCount = Math.min(Math.floor(house.score * 1.2), 180);
+                
+                if (house.gems.length < targetGemCount) {
+                    house.gems.push(new Gem(w, h, house.gemColors, false));
+                } else if (house.gems.length > targetGemCount) {
+                    house.gems.pop();
+                }
+
+                // Update & Draw gems
+                house.gems.forEach(gem => {
+                    gem.update(w, h, house.gems);
+                    gem.draw(ctx);
+                });
+            });
+
+            requestAnimationFrame(animateHourglasses);
+        }
+
+        // --- SPARKLE CELEBRATION EFFECTS ---
+        let particles = [];
+        const fxCanvas = document.getElementById('effects-canvas');
+        const fxCtx = fxCanvas.getContext('2d');
+
+        function resizeFxCanvas() {
+            fxCanvas.width = window.innerWidth;
+            fxCanvas.height = window.innerHeight;
+        }
+
+        function triggerSparkles(houseKey) {
+            const card = document.getElementById(`card-${houseKey}`);
+            if (!card) return;
+            const rect = card.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 35; i++) {
+                particles.push({
+                    x: centerX,
+                    y: centerY,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10 - 2,
+                    size: Math.random() * 4 + 2,
+                    color: HOUSES[houseKey].gemColors[0],
+                    life: 1
+                });
+            }
+        }
+
+        function animateEffects() {
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+            particles.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+
+                if (p.life <= 0) {
+                    particles.splice(idx, 1);
+                    return;
+                }
+
+                fxCtx.save();
+                fxCtx.globalAlpha = p.life;
+                fxCtx.beginPath();
+                fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                fxCtx.fillStyle = p.color;
+                fxCtx.shadowColor = p.color;
+                fxCtx.shadowBlur = 8;
+                fxCtx.fill();
+                fxCtx.restore();
+            });
+            requestAnimationFrame(animateEffects);
+        }
+
+        // --- LEDGER LOG ---
+        function addLogEntry(msg, type) {
+            const container = document.getElementById('log-container');
+            if (historyLog.length === 0) {
+                container.innerHTML = '';
+            }
+
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const item = document.createElement('div');
+            item.className = `flex items-center justify-between p-2 rounded-lg bg-black/40 border-l-4 ${type === 'award' ? 'border-emerald-500 text-emerald-200' : 'border-red-500 text-red-200'}`;
+            item.innerHTML = `
+                <span>${msg}</span>
+                <span class="text-xs text-gray-500 font-cinzel">${time}</span>
+            `;
+
+            container.prepend(item);
+            historyLog.unshift({ msg, time, type });
+
+            if (container.children.length > 20) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function clearLog() {
+            historyLog = [];
+            document.getElementById('log-container').innerHTML = '<p class="text-gray-500 text-xs italic text-center py-2">No recent point adjustments recorded.</p>';
+        }
+
+        // --- PERSISTENCE & RESET ---
+        function saveState() {
+            const data = {
+                scores: {
+                    gryffindor: HOUSES.gryffindor.score,
+                    hufflepuff: HOUSES.hufflepuff.score,
+                    ravenclaw: HOUSES.ravenclaw.score,
+                    slytherin: HOUSES.slytherin.score
+                }
+            };
+            localStorage.setItem('hogwarts_house_points', JSON.stringify(data));
+        }
+
+        function loadState() {
+            const raw = localStorage.getItem('hogwarts_house_points');
+            if (raw) {
+                try {
+                    const data = JSON.parse(raw);
+                    if (data.scores) {
+                        Object.keys(data.scores).forEach(key => {
+                            if (HOUSES[key]) {
+                                HOUSES[key].score = data.scores[key] || 0;
+                                document.getElementById(`score-${key}`).innerText = HOUSES[key].score;
+                                // Pre-fill bottom gems for saved score
+                                const initialGems = Math.min(Math.floor(HOUSES[key].score * 1.2), 150);
+                                for(let i=0; i<initialGems; i++) {
+                                    if(HOUSES[key].canvas) {
+                                        HOUSES[key].gems.push(new Gem(HOUSES[key].canvas.width, HOUSES[key].canvas.height, HOUSES[key].gemsColor || HOUSES[key].gemColors, true));
+                                    }
+                                }
+                            }
+                        });
+                        updateLeadBadges();
+                    }
+                } catch(e) {
+                    console.error("Failed loading saved scores:", e);
+                }
+            }
+        }
+
+        function confirmReset() {
+            if (confirm("Are you sure you want to reset all House Points to zero?")) {
+                Object.keys(HOUSES).forEach(key => {
+                    HOUSES[key].score = 0;
+                    HOUSES[key].gems = [];
+                    document.getElementById(`score-${key}`).innerText = "0";
+                });
+                updateLeadBadges();
+                saveState();
+                addLogEntry("Reset all house points to zero.", "deduct");
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('resize', () => {
+            initCanvases();
+            resizeFxCanvas();
+        });
+
+        window.onload = function() {
+            initCanvases();
+            resizeFxCanvas();
+            loadState();
+            setPointsPreset(5);
+            animateHourglasses();
+            animateEffects();
+        };
+    </script>
+</body>
+</html>
