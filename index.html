@@ -4,32 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hogwarts House Points Counter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --text-color: #f0f6fc;
-            --gryffindor: #ae0001;
-            --hufflepuff: #ecb939;
-            --ravenclaw: #222f5b;
-            --slytherin: #1a472a;
+            --bg-color: #07090e;
+            --card-bg: rgba(20, 25, 38, 0.6);
+            --border-color: rgba(212, 175, 55, 0.15);
+            --gold: #d4af37;
+            --text-main: #f0f4f8;
+            --text-muted: #94a3b8;
+            
+            --gryffindor: #d42e2e;
+            --gryffindor-glow: rgba(212, 46, 46, 0.4);
+            --hufflepuff: #f59e0b;
+            --hufflepuff-glow: rgba(245, 158, 11, 0.4);
+            --ravenclaw: #3b82f6;
+            --ravenclaw-glow: rgba(59, 130, 246, 0.4);
+            --slytherin: #10b981;
+            --slytherin-glow: rgba(16, 185, 129, 0.4);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Plus Jakarta+Sans', sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(212, 46, 46, 0.03) 0%, transparent 40%);
             overflow-x: hidden;
         }
 
@@ -39,85 +53,119 @@
         }
 
         header h1 {
-            font-size: 1.8rem;
-            font-weight: 300;
-            letter-spacing: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: 6px;
             text-transform: uppercase;
-            color: #8b949e;
-            margin-bottom: 8px;
+            color: var(--gold);
+            margin-bottom: 6px;
+            text-shadow: 0 2px 20px rgba(212, 175, 55, 0.2);
         }
 
-        /* Houses Container - Inline Display */
+        header p {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Houses Container - Inline & Minimalist */
         .houses-container {
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
-            gap: 40px;
+            align-items: stretch;
+            gap: 24px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1300px;
             margin-bottom: 40px;
+            flex-wrap: wrap;
         }
 
         .house-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 30px 20px;
-            width: 220px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 24px;
+            width: 260px;
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .house-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-6px);
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         /* Leader Badge */
         .leader-badge {
             position: absolute;
-            top: -12px;
-            background: #d4af37;
-            color: #0d1117;
-            font-size: 0.7rem;
+            top: -14px;
+            background: linear-gradient(135deg, #f3e7c4, #d4af37);
+            color: #07090e;
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 2px;
-            padding: 4px 12px;
+            letter-spacing: 3px;
+            padding: 5px 14px;
             border-radius: 20px;
             text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
             opacity: 0;
-            transform: scale(0.8);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(0.7) translateY(5px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 5;
         }
 
         .house-card.is-leader .leader-badge {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateY(0);
         }
 
         /* House Name */
         .house-name {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            text-align: center;
         }
 
-        /* Hourglass Container - Taller */
+        .gryffindor-title { color: #f87171; }
+        .hufflepuff-title { color: #fbbf24; }
+        .ravenclaw-title { color: #60a5fa; }
+        .slytherin-title { color: #34d399; }
+
+        /* Taller Hourglass */
         .hourglass {
-            width: 70px;
-            height: 180px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            width: 80px;
+            height: 240px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
             position: relative;
             overflow: hidden;
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .hourglass-glass-shine {
+            position: absolute;
+            top: 0;
+            right: 12px;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.15), transparent);
+            pointer-events: none;
+            z-index: 4;
         }
 
         .hourglass-fill {
@@ -129,382 +177,4 @@
             transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Gem Particles */
-        .gem {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: fall 0.8s ease-in forwards;
-            z-index: 10;
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-50px) scale(0.5);
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(var(--fall-distance)) scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Points Counter */
-        .points-display {
-            font-size: 2.2rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        /* Control Panel */
-        .control-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .control-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .control-group-label {
-            font-size: 0.8rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: #8b949e;
-            margin-bottom: 4px;
-            width: 100%;
-            text-align: center;
-        }
-
-        select, button {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-color);
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        select:hover, button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        select:focus, button:focus {
-            outline: none;
-            border-color: #58a6ff;
-        }
-
-        .mode-toggle {
-            display: flex;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 3px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .mode-btn {
-            background: transparent;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            color: #8b949e;
-            font-weight: 500;
-        }
-
-        .mode-btn.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text-color);
-        }
-
-        .inc-btn {
-            min-width: 65px;
-            font-weight: 500;
-        }
-
-        .reset-btn {
-            background: rgba(218, 54, 51, 0.15);
-            border-color: rgba(218, 54, 51, 0.3);
-            color: #ff7b72;
-            margin-top: 10px;
-            width: 100%;
-            max-width: 200px;
-        }
-
-        .reset-btn:hover {
-            background: rgba(218, 54, 51, 0.3);
-            border-color: rgba(218, 54, 51, 0.5);
-        }
-
-        /* House Specific Colors */
-        .gryffindor-color { color: #ff7b72; }
-        .hufflepuff-color { color: #f0e68c; }
-        .ravenclaw-color { color: #79c0ff; }
-        .slytherin-color { color: #56d364; }
-
-        .gryffindor-fill { background: var(--gryffindor); box-shadow: 0 0 12px var(--gryffindor); }
-        .hufflepuff-fill { background: var(--hufflepuff); box-shadow: 0 0 12px var(--hufflepuff); }
-        .ravenclaw-fill { background: var(--ravenclaw); box-shadow: 0 0 12px var(--ravenclaw); }
-        .slytherin-fill { background: var(--slytherin); box-shadow: 0 0 12px var(--slytherin); }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Hogwarts House Points</h1>
-    </header>
-
-    <!-- Inline Houses Display -->
-    <div class="houses-container" id="housesContainer">
-        <!-- Gryffindor -->
-        <div class="house-card" data-house="gryffindor">
-            <div class="leader-badge">Leader</div>
-            <div class="house-name gryffindor-color">Gryffindor</div>
-            <div class="hourglass" id="hourglass-gryffindor">
-                <div class="hourglass-fill gryffindor-fill" id="fill-gryffindor"></div>
-            </div>
-            <div class="points-display" id="points-gryffindor">0</div>
-        </div>
-
-        <!-- Hufflepuff -->
-        <div class="house-card" data-house="hufflepuff">
-            <div class="leader-badge">Leader</div>
-            <div class="house-name hufflepuff-color">Hufflepuff</div>
-            <div class="hourglass" id="hourglass-hufflepuff">
-                <div class="hourglass-fill hufflepuff-fill" id="fill-hufflepuff"></div>
-            </div>
-            <div class="points-display" id="points-hufflepuff">0</div>
-        </div>
-
-        <!-- Ravenclaw -->
-        <div class="house-card" data-house="ravenclaw">
-            <div class="leader-badge">Leader</div>
-            <div class="house-name ravenclaw-color">Ravenclaw</div>
-            <div class="hourglass" id="hourglass-ravenclaw">
-                <div class="hourglass-fill ravenclaw-fill" id="fill-ravenclaw"></div>
-            </div>
-            <div class="points-display" id="points-ravenclaw">0</div>
-        </div>
-
-        <!-- Slytherin -->
-        <div class="house-card" data-house="slytherin">
-            <div class="leader-badge">Leader</div>
-            <div class="house-name slytherin-color">Slytherin</div>
-            <div class="hourglass" id="hourglass-slytherin">
-                <div class="hourglass-fill slytherin-fill" id="fill-slytherin"></div>
-            </div>
-            <div class="points-display" id="points-slytherin">0</div>
-        </div>
-    </div>
-
-    <!-- Control Panel -->
-    <div class="control-panel">
-        <div>
-            <div class="control-group-label">Select House</div>
-            <div class="control-row">
-                <select id="houseSelect">
-                    <option value="gryffindor">Gryffindor</option>
-                    <option value="hufflepuff">Hufflepuff</option>
-                    <option value="ravenclaw">Ravenclaw</option>
-                    <option value="slytherin">Slytherin</option>
-                </select>
-            </div>
-        </div>
-
-        <div>
-            <div class="control-group-label">Action</div>
-            <div class="control-row">
-                <div class="mode-toggle">
-                    <button class="mode-btn active" data-mode="plus" id="modePlus">+</button>
-                    <button class="mode-btn" data-mode="minus" id="modeMinus">-</button>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <div class="control-group-label">Points</div>
-            <div class="control-row">
-                <button class="inc-btn" onclick="adjustPoints(10)">10</button>
-                <button class="inc-btn" onclick="adjustPoints(25)">25</button>
-                <button class="inc-btn" onclick="adjustPoints(50)">50</button>
-                <button class="inc-btn" onclick="adjustPoints(100)">100</button>
-            </div>
-        </div>
-
-        <button class="reset-btn" onclick="resetPoints()">Reset All to 0</button>
-    </div>
-
-    <script>
-        const state = {
-            gryffindor: 0,
-            hufflepuff: 0,
-            ravenclaw: 0,
-            slytherin: 0
-        };
-
-        const gemColors = {
-            gryffindor: '#ff7b72',
-            hufflepuff: '#f0e68c',
-            ravenclaw: '#79c0ff',
-            slytherin: '#56d364'
-        };
-
-        let currentMode = 'plus';
-
-        // Web Audio API Magical Sound Effect (Wand Chime/Sparkles)
-        let audioCtx = null;
-
-        function playMagicSound(isDeduct = false) {
-            try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-
-                const now = audioCtx.currentTime;
-                // Magical pentatonic / high frequency sparkling notes
-                const notes = isDeduct ? [523.25, 440, 349.23, 261.63] : [523.25, 659.25, 783.99, 1046.50, 1318.51];
-                
-                notes.forEach((freq, index) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + (index * 0.05));
-
-                    gain.gain.setValueAtTime(0.08, now + (index * 0.05));
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + (index * 0.05) + 0.35);
-
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-
-                    osc.start(now + (index * 0.05));
-                    osc.stop(now + (index * 0.05) + 0.35);
-                });
-            } catch (e) {
-                console.log('Audio context not allowed yet or not supported');
-            }
-        }
-
-        // Mode Toggles (+ / -)
-        const modePlus = document.getElementById('modePlus');
-        const modeMinus = document.getElementById('modeMinus');
-
-        modePlus.addEventListener('click', () => {
-            currentMode = 'plus';
-            modePlus.classList.add('active');
-            modeMinus.classList.remove('active');
-        });
-
-        modeMinus.addEventListener('click', () => {
-            currentMode = 'minus';
-            modeMinus.classList.add('active');
-            modePlus.classList.remove('active');
-        });
-
-        function adjustPoints(amount) {
-            const house = document.getElementById('houseSelect').value;
-            const finalAmount = currentMode === 'plus' ? amount : -amount;
-            
-            state[house] = Math.max(0, state[house] + finalAmount);
-            
-            playMagicSound(currentMode === 'minus');
-
-            if (currentMode === 'plus' && finalAmount > 0) {
-                spawnGems(house, Math.min(amount, 15));
-            }
-
-            updateUI();
-        }
-
-        function resetPoints() {
-            Object.keys(state).forEach(house => {
-                state[house] = 0;
-            });
-            playMagicSound(true);
-            updateUI();
-        }
-
-        function spawnGems(house, count) {
-            const hourglass = document.getElementById(`hourglass-${house}`);
-            const rect = hourglass.getBoundingClientRect();
-            
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const gem = document.createElement('div');
-                    gem.className = 'gem';
-                    gem.style.background = gemColors[house];
-                    gem.style.boxShadow = `0 0 8px ${gemColors[house]}`;
-                    
-                    const startX = Math.random() * (rect.width - 12);
-                    gem.style.left = `${startX}px`;
-                    gem.style.top = `10px`;
-                    
-                    const fallDistance = Math.random() * 120 + 20;
-                    gem.style.setProperty('--fall-distance', `${fallDistance}px`);
-                    
-                    hourglass.appendChild(gem);
-                    
-                    setTimeout(() => {
-                        gem.remove();
-                    }, 800);
-                }, i * 40);
-            }
-        }
-
-        function updateUI() {
-            let maxPoints = -1;
-            let leaderHouse = null;
-            let isTie = false;
-
-            for (const [house, points] of Object.entries(state)) {
-                document.getElementById(`points-${house}`).innerText = points;
-                
-                // Taller hourglass fill percentage (reference max 500 points)
-                const fillPercent = Math.min(100, (points / 500) * 100);
-                document.getElementById(`fill-${house}`).style.height = `${fillPercent}%`;
-
-                if (points > maxPoints) {
-                    maxPoints = points;
-                    leaderHouse = house;
-                    isTie = false;
-                } else if (points === maxPoints && maxPoints > 0) {
-                    isTie = true;
-                }
-            }
-
-            document.querySelectorAll('.house-card').forEach(card => {
-                const house = card.getAttribute('data-house');
-                if (!isTie && maxPoints > 0 && house === leaderHouse) {
-                    card.classList.add('is-leader');
-                } else {
-                    card.classList.remove('is-leader');
-                }
-            });
-        }
-
-        updateUI();
-    </script>
-</body>
-</html>
+        .gryffindor-fill { background: var(--gry
